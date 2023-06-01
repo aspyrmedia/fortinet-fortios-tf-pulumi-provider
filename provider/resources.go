@@ -20,7 +20,6 @@ import (
 	"strings"
 
 	"github.com/ettle/strcase"
-	"github.com/fortinetdev/terraform-provider-fortios/fortios"
 	"github.com/pulumi/pulumi-terraform-bridge/v3/pkg/tfbridge"
 	shim "github.com/pulumi/pulumi-terraform-bridge/v3/pkg/tfshim"
 	shimv2 "github.com/pulumi/pulumi-terraform-bridge/v3/pkg/tfshim/sdk-v2"
@@ -28,6 +27,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/common/tokens"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/util/contract"
 	"github.com/pulumiverse/pulumi-fortios/provider/pkg/version"
+	"github.com/terraform-providers/terraform-provider-fortios/fortios"
 )
 
 // all of the token components used below.
@@ -94,7 +94,7 @@ func Provider() tfbridge.ProviderInfo {
 		Keywords: []string{
 			"pulumi",
 			"fortios",
-			"category/network",
+			"category/cloud",
 		},
 		License:    "Apache-2.0",
 		Homepage:   "https://github.com/pulumiverse/pulumi-fortios",
@@ -103,7 +103,7 @@ func Provider() tfbridge.ProviderInfo {
 		// should match the TF provider module's require directive, not any replace directives.
 		Version:   version.Version,
 		GitHubOrg: "fortinetdev",
-		Config:    map[string]*tfbridge.SchemaInfo{
+		Config: map[string]*tfbridge.SchemaInfo{
 			// Add any required configuration here, or remove the example below if
 			// no additional points are required.
 			// "region": {
@@ -112,6 +112,105 @@ func Provider() tfbridge.ProviderInfo {
 			// 		EnvVars: []string{"AWS_REGION", "AWS_DEFAULT_REGION"},
 			// 	},
 			// },
+			"hostname": {
+				MarkAsOptional: tfbridge.True(),
+				Default: &tfbridge.DefaultInfo{
+					EnvVars: []string{"FORTIOS_ACCESS_HOSTNAME"},
+				},
+			},
+			"token": {
+				MarkAsOptional: tfbridge.True(),
+				Secret:         tfbridge.True(),
+				Default: &tfbridge.DefaultInfo{
+					EnvVars: []string{"FORTIOS_ACCESS_TOKEN"},
+				},
+			},
+			"insecure": {
+				MarkAsOptional: tfbridge.True(),
+				Default: &tfbridge.DefaultInfo{
+					EnvVars: []string{"FORTIOS_INSECURE"},
+				},
+			},
+			"cabundlefile": {
+				MarkAsOptional: tfbridge.True(),
+				Default: &tfbridge.DefaultInfo{
+					EnvVars: []string{"FORTIOS_CA_CABUNDLE"},
+				},
+			},
+			"cabundlecontent": {
+				MarkAsOptional: tfbridge.True(),
+				Default: &tfbridge.DefaultInfo{
+					EnvVars: []string{"FORTIOS_CA_CABUNDLECONTENT"},
+				},
+			},
+			"http_proxy": {
+				MarkAsOptional: tfbridge.True(),
+				Default: &tfbridge.DefaultInfo{
+					EnvVars: []string{"FORTIOS_HTTP_PROXY"},
+				},
+			},
+			"peerauth": {
+				MarkAsOptional: tfbridge.True(),
+				Default: &tfbridge.DefaultInfo{
+					EnvVars: []string{"FORTIOS_CA_PEERAUTH"},
+				},
+			},
+			"cacert": {
+				MarkAsOptional: tfbridge.True(),
+				Default: &tfbridge.DefaultInfo{
+					EnvVars: []string{"FORTIOS_CA_CACERT"},
+				},
+			},
+			"clientcert": {
+				MarkAsOptional: tfbridge.True(),
+				Default: &tfbridge.DefaultInfo{
+					EnvVars: []string{"FORTIOS_CA_CLIENTCERT"},
+				},
+			},
+			"clientkey": {
+				MarkAsOptional: tfbridge.True(),
+				Secret:         tfbridge.True(),
+				Default: &tfbridge.DefaultInfo{
+					EnvVars: []string{"FORTIOS_CA_CLIENTKEY"},
+				},
+			},
+			"vdom": {
+				MarkAsOptional: tfbridge.True(),
+				Default: &tfbridge.DefaultInfo{
+					EnvVars: []string{"FORTIOS_VDOM"},
+				},
+			},
+			"fmg_hostname": {
+				MarkAsOptional: tfbridge.True(),
+				Default: &tfbridge.DefaultInfo{
+					EnvVars: []string{"FORTIOS_FMG_HOSTNAME"},
+				},
+			},
+			"fmg_username": {
+				MarkAsOptional: tfbridge.True(),
+				Default: &tfbridge.DefaultInfo{
+					EnvVars: []string{"FORTIOS_FMG_USERNAME"},
+				},
+			},
+			"fmg_passwd": {
+				MarkAsOptional: tfbridge.True(),
+				Secret:         tfbridge.True(),
+				Default: &tfbridge.DefaultInfo{
+					EnvVars: []string{"FORTIOS_FMG_PASSWORD"},
+				},
+			},
+			"fmg_insecure": {
+				MarkAsOptional: tfbridge.True(),
+				Default: &tfbridge.DefaultInfo{
+					EnvVars: []string{"FORTIOS_FMG_INSECURE"},
+				},
+			},
+			"fmg_cabundlefile": {
+				MarkAsOptional: tfbridge.True(),
+				Default: &tfbridge.DefaultInfo{
+					EnvVars: []string{"FORTIOS_FMG_CABUNDLE"},
+				},
+			},
 		},
 		PreConfigureCallback: preConfigureCallback,
 		Resources: map[string]*tfbridge.ResourceInfo{
@@ -127,15 +226,6 @@ func Provider() tfbridge.ProviderInfo {
 			// 		"tags": {Type: tfbridge.MakeType("fortios", "Tags")},
 			// 	},
 			// },
-			// "fortios_switchcontrollersecuritypolicy_8021X": {
-			// 	Tok: makeResource(mainMod, "fortios_switchcontrollersecuritypolicy_8021X"),
-			// },
-			"fortios_switchcontroller_8021Xsettings": {
-				Tok: makeResource(mainMod, "fortios_switchcontroller_8021Xsettings"),
-			},
-			"fortios_switchcontrollersecuritypolicy_8021X": {
-				Tok: makeResource(mainMod, "fortios_switchcontrollersecuritypolicy_8021X"),
-			},
 			"fortios_alertemail_setting": {
 				Tok: makeResource(mainMod, "fortios_alertemail_setting"),
 			},
@@ -526,9 +616,6 @@ func Provider() tfbridge.ProviderInfo {
 			"fortios_firewall_region": {
 				Tok: makeResource(mainMod, "fortios_firewall_region"),
 			},
-			"fortios_firewall_security_policy": {
-				Tok: makeResource(mainMod, "fortios_firewall_security_policy"),
-			},
 			"fortios_firewall_security_policyseq": {
 				Tok: makeResource(mainMod, "fortios_firewall_security_policyseq"),
 			},
@@ -759,9 +846,6 @@ func Provider() tfbridge.ProviderInfo {
 			},
 			"fortios_log_eventfilter": {
 				Tok: makeResource(mainMod, "fortios_log_eventfilter"),
-			},
-			"fortios_log_fortianalyzer_setting": {
-				Tok: makeResource(mainMod, "fortios_log_fortianalyzer_setting"),
 			},
 			"fortios_log_guidisplay": {
 				Tok: makeResource(mainMod, "fortios_log_guidisplay"),
@@ -1084,6 +1168,9 @@ func Provider() tfbridge.ProviderInfo {
 			"fortios_sshfilter_profile": {
 				Tok: makeResource(mainMod, "fortios_sshfilter_profile"),
 			},
+			"fortios_switchcontroller_8021Xsettings": {
+				Tok: makeResource(mainMod, "fortios_switchcontroller_8021Xsettings"),
+			},
 			"fortios_switchcontroller_customcommand": {
 				Tok: makeResource(mainMod, "fortios_switchcontroller_customcommand"),
 			},
@@ -1224,6 +1311,9 @@ func Provider() tfbridge.ProviderInfo {
 			},
 			"fortios_switchcontrollerqos_queuepolicy": {
 				Tok: makeResource(mainMod, "fortios_switchcontrollerqos_queuepolicy"),
+			},
+			"fortios_switchcontrollersecuritypolicy_8021X": {
+				Tok: makeResource(mainMod, "fortios_switchcontrollersecuritypolicy_8021X"),
 			},
 			"fortios_switchcontrollersecuritypolicy_captiveportal": {
 				Tok: makeResource(mainMod, "fortios_switchcontrollersecuritypolicy_captiveportal"),
@@ -1773,12 +1863,6 @@ func Provider() tfbridge.ProviderInfo {
 			},
 			"fortios_voip_profile": {
 				Tok: makeResource(mainMod, "fortios_voip_profile"),
-			},
-			"fortios_vpn_ipsec_phase1interface": {
-				Tok: makeResource(mainMod, "fortios_vpn_ipsec_phase1interface"),
-			},
-			"fortios_vpn_ipsec_phase2interface": {
-				Tok: makeResource(mainMod, "fortios_vpn_ipsec_phase2interface"),
 			},
 			"fortios_vpn_l2tp": {
 				Tok: makeResource(mainMod, "fortios_vpn_l2tp"),
@@ -2784,6 +2868,12 @@ func Provider() tfbridge.ProviderInfo {
 			"fortios_user_samllist": {
 				Tok: makeDataSource(mainMod, "fortios_user_samllist"),
 			},
+		},
+		IgnoreMappings: []string{
+			"fortios_vpn_ipsec_phase1interface", // deprecated
+			"fortios_vpn_ipsec_phase2interface", // deprecated
+			"fortios_log_fortianalyzer_setting", // deprecated
+			"fortios_firewall_security_policy",  // deprecated
 		},
 		JavaScript: &tfbridge.JavaScriptInfo{
 			PackageName: "@pulumiverse/fortios",

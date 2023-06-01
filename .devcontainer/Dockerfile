@@ -14,7 +14,7 @@ RUN apt-get update && \
 # See README.md
 
 # Install go
-ARG GO_VERSION=1.19.8
+ARG GO_VERSION=1.20.4
 RUN rm -rf /usr/local/go && \
     wget -O- https://golang.org/dl/go${GO_VERSION}.linux-amd64.tar.gz | \
     tar -C /usr/local -xzf -

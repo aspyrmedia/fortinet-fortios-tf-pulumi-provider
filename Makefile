@@ -1,10 +1,11 @@
+ROOT_DIR         := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 SHELL            := /bin/bash
 PROJECT          := github.com/pulumiverse/pulumi-fortios
 NODE_MODULE_NAME := @pulumiverse/fortios
 TF_NAME          := fortios
 PROVIDER_PATH    := provider
 VERSION_PATH     := ${PROVIDER_PATH}/pkg/version.Version
-
+PULUMI_REPO_PATHS:= github.com/fortinetdev/terraform-provider-fortios=$(ROOT_DIR)/upstream
 JAVA_GEN         := pulumi-java-gen
 JAVA_GEN_VERSION := v0.9.3
 TFGEN            := pulumi-tfgen-fortios
@@ -17,12 +18,13 @@ WORKING_DIR      := $(shell pwd)
 
 GO_MAJOR_VERSION := $(shell go version | cut -c 14- | cut -d' ' -f1 | cut -d'.' -f1)
 GO_MINOR_VERSION := $(shell go version | cut -c 14- | cut -d' ' -f1 | cut -d'.' -f2)
+
 ####
 # Defines the required Go version. This is a safeguard, because
 # the (local) version must match the version specified in .github/workflows/release.yml
 # otherwise publkishing the Go SDK of the provider will fail
 REQUIRED_GO_MAJOR_VERSION := 1
-REQUIRED_GO_MINOR_VERSION := 19
+REQUIRED_GO_MINOR_VERSION := 20
 GO_VERSION_VALIDATION_ERR_MSG := Golang version $(REQUIRED_GO_MAJOR_VERSION).$(REQUIRED_GO_MINOR_VERSION) is required
 
 .PHONY: development provider build_sdks build_nodejs build_dotnet build_go build_python cleanup validate_go_version
@@ -37,15 +39,19 @@ validate_go_version: ## Validates the installed version of go
 		exit 1 ;\
 	fi
 
+upstream/.git:
+		@echo "Initializing upstream" ; \
+		git clone  --depth 1 --branch v1.16.0 git@github.com:fortinetdev/terraform-provider-fortios upstream
+
 development:: install_plugins provider lint_provider build_sdks install_sdks cleanup # Build the provider & SDKs for a development environment
 
 # Required for the codegen action that runs in pulumi/pulumi and pulumi/pulumi-terraform-bridge
 build:: install_plugins provider build_sdks install_sdks
 only_build:: build
 
-tfgen:: install_plugins
+tfgen:: install_plugins upstream/.git
 	(cd provider && go build -o $(WORKING_DIR)/bin/${TFGEN} -ldflags "-X ${PROJECT}/${VERSION_PATH}=${VERSION}" ${PROJECT}/${PROVIDER_PATH}/cmd/${TFGEN})
-	$(WORKING_DIR)/bin/${TFGEN} schema --out provider/cmd/${PROVIDER}
+	PULUMI_REPO_PATHS='$(PULUMI_REPO_PATHS)' $(WORKING_DIR)/bin/${TFGEN} schema --out provider/cmd/${PROVIDER}
 	(cd provider && VERSION=$(VERSION) go generate cmd/${PROVIDER}/main.go)
 
 provider:: tfgen install_plugins # build the provider binary
@@ -55,7 +61,7 @@ build_sdks:: install_plugins provider build_nodejs build_python build_go build_d
 
 build_nodejs:: VERSION := $(shell pulumictl get version --language javascript)
 build_nodejs:: install_plugins tfgen # build the node sdk
-	$(WORKING_DIR)/bin/$(TFGEN) nodejs --overlays provider/overlays/nodejs --out sdk/nodejs/
+	PULUMI_REPO_PATHS='$(PULUMI_REPO_PATHS)' $(WORKING_DIR)/bin/${TFGEN} nodejs --overlays provider/overlays/nodejs --out sdk/nodejs/
 	cd sdk/nodejs/ && \
         yarn install && \
         yarn run tsc && \
@@ -65,7 +71,7 @@ build_nodejs:: install_plugins tfgen # build the node sdk
 
 build_python:: PYPI_VERSION := $(shell pulumictl get version --language python)
 build_python:: install_plugins tfgen # build the python sdk
-	$(WORKING_DIR)/bin/$(TFGEN) python --overlays provider/overlays/python --out sdk/python/
+	PULUMI_REPO_PATHS='$(PULUMI_REPO_PATHS)' $(WORKING_DIR)/bin/${TFGEN} python --overlays provider/overlays/python --out sdk/python/
 	cd sdk/python/ && \
         cp ../../README.md . && \
         python3 setup.py clean --all 2>/dev/null && \
@@ -77,19 +83,19 @@ build_python:: install_plugins tfgen # build the python sdk
 build_dotnet:: DOTNET_VERSION := $(shell pulumictl get version --language dotnet)
 build_dotnet:: install_plugins tfgen # build the dotnet sdk
 	pulumictl get version --language dotnet
-	$(WORKING_DIR)/bin/$(TFGEN) dotnet --overlays provider/overlays/dotnet --out sdk/dotnet/
+	PULUMI_REPO_PATHS='$(PULUMI_REPO_PATHS)' $(WORKING_DIR)/bin/${TFGEN} dotnet --overlays provider/overlays/dotnet --out sdk/dotnet/
 	cd sdk/dotnet/ && \
 		echo "${DOTNET_VERSION}" >version.txt && \
         dotnet build /p:Version=${DOTNET_VERSION}
 
 build_go:: install_plugins tfgen # build the go sdk
-	$(WORKING_DIR)/bin/$(TFGEN) go --overlays provider/overlays/go --out sdk/go/
+	PULUMI_REPO_PATHS='$(PULUMI_REPO_PATHS)' $(WORKING_DIR)/bin/${TFGEN} go --overlays provider/overlays/go --out sdk/go/
 	cd sdk/go/ && \
 		go mod tidy
 
 build_java:: PACKAGE_VERSION := $(shell pulumictl get version --language generic)
 build_java:: $(WORKING_DIR)/bin/$(JAVA_GEN)
-	$(WORKING_DIR)/bin/$(JAVA_GEN) generate --schema provider/cmd/$(PROVIDER)/schema.json --out sdk/java  --build gradle-nexus
+	PULUMI_REPO_PATHS='$(PULUMI_REPO_PATHS)' $(WORKING_DIR)/bin/$(JAVA_GEN) generate --schema provider/cmd/$(PROVIDER)/schema.json --out sdk/java  --build gradle-nexus
 	cd sdk/java/ && \
 		echo "module fake_java_module // Exclude this directory from Go tools\n\ngo 1.17" > go.mod && \
 		gradle --console=plain build
@@ -101,7 +107,8 @@ lint_provider:: provider # lint the provider code
 	cd provider && golangci-lint run -c ../.golangci.yml
 
 cleanup:: # cleans up the temporary directory
-	rm -r $(WORKING_DIR)/bin
+	rm -rf $(WORKING_DIR)/bin
+	rm -rf $(WORKING_DIR)/upstream
 	rm -f provider/cmd/${PROVIDER}/schema.go
 
 help::
