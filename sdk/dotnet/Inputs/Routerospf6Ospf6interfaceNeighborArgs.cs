@@ -11,7 +11,7 @@ using Pulumi;
 namespace Pulumiverse.Fortios.Inputs
 {
 
-    public sealed class Routerospf6Ospf6interfaceNeighborArgs : global::Pulumi.ResourceArgs
+    public sealed class RouterOspf6Ospf6InterfaceNeighborArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
         /// Cost of the interface, value range from 0 to 65535, 0 means auto-cost.
@@ -37,9 +37,9 @@ namespace Pulumiverse.Fortios.Inputs
         [Input("priority")]
         public Input<int>? Priority { get; set; }
 
-        public Routerospf6Ospf6interfaceNeighborArgs()
+        public RouterOspf6Ospf6InterfaceNeighborArgs()
         {
         }
-        public static new Routerospf6Ospf6interfaceNeighborArgs Empty => new Routerospf6Ospf6interfaceNeighborArgs();
+        public static new RouterOspf6Ospf6InterfaceNeighborArgs Empty => new RouterOspf6Ospf6InterfaceNeighborArgs();
     }
 }

@@ -11,23 +11,33 @@ using Pulumi;
 namespace Pulumiverse.Fortios.Inputs
 {
 
-    public sealed class RouterospfOspfinterfaceMd5KeyArgs : global::Pulumi.ResourceArgs
+    public sealed class RouterOspfOspfInterfaceMd5KeyArgs : global::Pulumi.ResourceArgs
     {
         /// <summary>
-        /// Key ID (1 - 255).
+        /// Area entry IP address.
         /// </summary>
         [Input("id")]
         public Input<int>? Id { get; set; }
 
+        [Input("keyString")]
+        private Input<string>? _keyString;
+
         /// <summary>
         /// Password for the key.
         /// </summary>
-        [Input("keyString")]
-        public Input<string>? KeyString { get; set; }
+        public Input<string>? KeyString
+        {
+            get => _keyString;
+            set
+            {
+                var emptySecret = Output.CreateSecret(0);
+                _keyString = Output.Tuple<Input<string>?, int>(value, emptySecret).Apply(t => t.Item1);
+            }
+        }
 
-        public RouterospfOspfinterfaceMd5KeyArgs()
+        public RouterOspfOspfInterfaceMd5KeyArgs()
         {
         }
-        public static new RouterospfOspfinterfaceMd5KeyArgs Empty => new RouterospfOspfinterfaceMd5KeyArgs();
+        public static new RouterOspfOspfInterfaceMd5KeyArgs Empty => new RouterOspfOspfInterfaceMd5KeyArgs();
     }
 }

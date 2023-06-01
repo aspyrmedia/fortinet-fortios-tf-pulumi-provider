@@ -12,7 +12,7 @@ namespace Pulumiverse.Fortios.Outputs
 {
 
     [OutputType]
-    public sealed class Routerospf6Ospf6interfaceIpsecKey
+    public sealed class RouterOspf6Ospf6InterfaceIpsecKey
     {
         /// <summary>
         /// Authentication key.
@@ -28,7 +28,7 @@ namespace Pulumiverse.Fortios.Outputs
         public readonly int? Spi;
 
         [OutputConstructor]
-        private Routerospf6Ospf6interfaceIpsecKey(
+        private RouterOspf6Ospf6InterfaceIpsecKey(
             string? authKey,
 
             string? encKey,

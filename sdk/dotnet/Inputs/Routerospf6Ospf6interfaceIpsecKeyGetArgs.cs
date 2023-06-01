@@ -11,19 +11,39 @@ using Pulumi;
 namespace Pulumiverse.Fortios.Inputs
 {
 
-    public sealed class Routerospf6Ospf6interfaceIpsecKeyGetArgs : global::Pulumi.ResourceArgs
+    public sealed class RouterOspf6Ospf6InterfaceIpsecKeyGetArgs : global::Pulumi.ResourceArgs
     {
+        [Input("authKey")]
+        private Input<string>? _authKey;
+
         /// <summary>
         /// Authentication key.
         /// </summary>
-        [Input("authKey")]
-        public Input<string>? AuthKey { get; set; }
+        public Input<string>? AuthKey
+        {
+            get => _authKey;
+            set
+            {
+                var emptySecret = Output.CreateSecret(0);
+                _authKey = Output.Tuple<Input<string>?, int>(value, emptySecret).Apply(t => t.Item1);
+            }
+        }
+
+        [Input("encKey")]
+        private Input<string>? _encKey;
 
         /// <summary>
         /// Encryption key.
         /// </summary>
-        [Input("encKey")]
-        public Input<string>? EncKey { get; set; }
+        public Input<string>? EncKey
+        {
+            get => _encKey;
+            set
+            {
+                var emptySecret = Output.CreateSecret(0);
+                _encKey = Output.Tuple<Input<string>?, int>(value, emptySecret).Apply(t => t.Item1);
+            }
+        }
 
         /// <summary>
         /// Security Parameters Index.
@@ -31,9 +51,9 @@ namespace Pulumiverse.Fortios.Inputs
         [Input("spi")]
         public Input<int>? Spi { get; set; }
 
-        public Routerospf6Ospf6interfaceIpsecKeyGetArgs()
+        public RouterOspf6Ospf6InterfaceIpsecKeyGetArgs()
         {
         }
-        public static new Routerospf6Ospf6interfaceIpsecKeyGetArgs Empty => new Routerospf6Ospf6interfaceIpsecKeyGetArgs();
+        public static new RouterOspf6Ospf6InterfaceIpsecKeyGetArgs Empty => new RouterOspf6Ospf6InterfaceIpsecKeyGetArgs();
     }
 }

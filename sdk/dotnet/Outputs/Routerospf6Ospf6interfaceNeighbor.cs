@@ -12,7 +12,7 @@ namespace Pulumiverse.Fortios.Outputs
 {
 
     [OutputType]
-    public sealed class Routerospf6Ospf6interfaceNeighbor
+    public sealed class RouterOspf6Ospf6InterfaceNeighbor
     {
         /// <summary>
         /// Cost of the interface, value range from 0 to 65535, 0 means auto-cost.
@@ -32,7 +32,7 @@ namespace Pulumiverse.Fortios.Outputs
         public readonly int? Priority;
 
         [OutputConstructor]
-        private Routerospf6Ospf6interfaceNeighbor(
+        private RouterOspf6Ospf6InterfaceNeighbor(
             int? cost,
 
             string? ip6,

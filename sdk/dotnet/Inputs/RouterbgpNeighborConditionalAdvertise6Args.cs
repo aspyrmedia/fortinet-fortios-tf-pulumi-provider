@@ -11,7 +11,7 @@ using Pulumi;
 namespace Pulumiverse.Fortios.Inputs
 {
 
-    public sealed class RouterbgpNeighborConditionalAdvertise6Args : global::Pulumi.ResourceArgs
+    public sealed class RouterBgpNeighborConditionalAdvertise6Args : global::Pulumi.ResourceArgs
     {
         /// <summary>
         /// Name of advertising route map.
@@ -33,9 +33,9 @@ namespace Pulumiverse.Fortios.Inputs
         [Input("conditionType")]
         public Input<string>? ConditionType { get; set; }
 
-        public RouterbgpNeighborConditionalAdvertise6Args()
+        public RouterBgpNeighborConditionalAdvertise6Args()
         {
         }
-        public static new RouterbgpNeighborConditionalAdvertise6Args Empty => new RouterbgpNeighborConditionalAdvertise6Args();
+        public static new RouterBgpNeighborConditionalAdvertise6Args Empty => new RouterBgpNeighborConditionalAdvertise6Args();
     }
 }

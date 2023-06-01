@@ -12,10 +12,10 @@ namespace Pulumiverse.Fortios.Outputs
 {
 
     [OutputType]
-    public sealed class RouterospfOspfinterfaceMd5Key
+    public sealed class RouterOspfOspfInterfaceMd5Key
     {
         /// <summary>
-        /// Key ID (1 - 255).
+        /// Area entry IP address.
         /// </summary>
         public readonly int? Id;
         /// <summary>
@@ -24,7 +24,7 @@ namespace Pulumiverse.Fortios.Outputs
         public readonly string? KeyString;
 
         [OutputConstructor]
-        private RouterospfOspfinterfaceMd5Key(
+        private RouterOspfOspfInterfaceMd5Key(
             int? id,
 
             string? keyString)

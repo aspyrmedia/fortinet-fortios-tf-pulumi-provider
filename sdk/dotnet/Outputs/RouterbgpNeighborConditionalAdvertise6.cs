@@ -12,7 +12,7 @@ namespace Pulumiverse.Fortios.Outputs
 {
 
     [OutputType]
-    public sealed class RouterbgpNeighborConditionalAdvertise6
+    public sealed class RouterBgpNeighborConditionalAdvertise6
     {
         /// <summary>
         /// Name of advertising route map.
@@ -30,7 +30,7 @@ namespace Pulumiverse.Fortios.Outputs
         public readonly string? ConditionType;
 
         [OutputConstructor]
-        private RouterbgpNeighborConditionalAdvertise6(
+        private RouterBgpNeighborConditionalAdvertise6(
             string? advertiseRoutemap,
 
             string? conditionRoutemap,
